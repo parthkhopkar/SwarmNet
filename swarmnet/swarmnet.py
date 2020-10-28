@@ -66,7 +66,7 @@ class SwarmNet(keras.Model):
         return extended_time_segs[:, self.time_seg_len:, :, :]
 
     @classmethod
-    def build_model(cls, num_nodes, output_dim, model_params, pred_steps=1, return_inputs=False):
+    def build_model(cls, num_nodes, input_dim, output_dim, model_params, pred_steps=1, return_inputs=False):
         model = cls(num_nodes, output_dim, model_params, pred_steps)
 
         optimizer = keras.optimizers.Adam(lr=model_params['learning_rate'])
@@ -74,7 +74,7 @@ class SwarmNet(keras.Model):
         model.compile(optimizer, loss='mse')
 
         n_edge_labels = max(model_params['edge_type'], 1) + 1
-        input_shape = [(None, model_params['time_seg_len'], num_nodes, output_dim),
+        input_shape = [(None, model_params['time_seg_len'], num_nodes, input_dim),
                        (None, num_nodes, num_nodes, n_edge_labels)]
 
         inputs = model.build(input_shape)
