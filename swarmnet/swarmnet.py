@@ -51,6 +51,7 @@ class SwarmNet(keras.Model):
         # edges shape [batch, num_nodes, num_nodes, edge_types], one-hot label along last axis.
         time_segs, edges = inputs
 
+        """
         extended_time_segs = tf.transpose(time_segs, [0, 2, 1, 3])
 
         for i in range(self.pred_steps):
@@ -64,6 +65,16 @@ class SwarmNet(keras.Model):
 
         # Return only the predicted part of extended_time_segs
         return extended_time_segs[:, self.time_seg_len:, :, :]
+        """
+        extended_time_segs = tf.transpose(time_segs, [0, 2, 1, 3])
+        condensed_state = self.conv1d(extended_time_segs)
+        condensed_state = tf.squeeze(condensed_state, axis=2)
+        node_state = self.graph_conv(condensed_state, edges, training)
+        output = self.out_layer(node_state)
+
+        return output
+
+
 
     @classmethod
     def build_model(cls, num_nodes, input_dim, output_dim, model_params, pred_steps=1, return_inputs=False):
